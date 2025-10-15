@@ -1,0 +1,218 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+    provider  = "postgresql"
+    url       = env("DATABASE_URL")
+    directUrl = env("DIRECT_URL")
+}
+
+model User {
+    id    String @id
+    name  String
+    email String
+    image String
+    cart  Json   @default("{}")
+
+    // Relations
+    ratings     Rating[]
+    Address     Address[]
+    designs     Design[]     // new: user\u2019s designs
+    store       Store?
+    buyerOrders Order[]   @relation("BuyerRelation")
+}
+
+model Store {
+    id          String   @id @default(cuid())
+    userId      String   @unique
+    name        String
+    description String
+    username    String   @unique
+    address     String
+    status      String   @default("pending")
+    isActive    Boolean  @default(false)
+    logo        String
+    email       String
+    contact     String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    products Product[]  // one-to-many with Product
+    orders   Order[]    // one-to-many with Order
+    user     User      @relation(fields: [userId], references: [id])
+}
+
+model Product {
+    id          String   @id @default(cuid())
+    name        String
+    description String
+    mrp         Float
+    price       Float
+    images      String[]
+    category    String
+    inStock     Boolean  @default(true)
+    storeId     String
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    // Relations
+    store       Store       @relation(fields: [storeId], references: [id], onDelete: Cascade)
+    orderItems  OrderItem[]
+    ratings     Rating[]
+    // Designs applied to this product (through ProductDesign join)
+    designs     ProductDesign[]
+}
+
+model Order {
+    id            String        @id @default(cuid())
+    total         Float
+    status        OrderStatus   @default(ORDER_PLACED)
+    userId        String
+    storeId       String
+    addressId     String
+    isPaid        Boolean       @default(false)
+    paymentMethod PaymentMethod
+    createdAt     DateTime      @default(now())
+    updatedAt     DateTime      @updatedAt
+    isCouponUsed  Boolean       @default(false)
+    coupon        Json          @default("{}")
+    orderItems    OrderItem[]
+
+    // Relations
+    user    User    @relation("BuyerRelation", fields: [userId], references: [id])
+    store   Store   @relation(fields: [storeId], references: [id])
+    address Address @relation(fields: [addressId], references: [id])
+}
+
+model OrderItem {
+    orderId   String
+    productId String
+    quantity  Int
+    price     Float
+
+    // Relations
+    order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id])
+
+    @@id([orderId, productId])
+}
+
+model Rating {
+    id        String   @id @default(cuid())
+    rating    Int
+    review    String
+    userId    String
+    productId String
+    orderId   String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, productId, orderId])
+}
+
+model Address {
+    id        String   @id @default(cuid())
+    userId    String
+    name      String
+    email     String
+    street    String
+    city      String
+    state     String
+    zip       String
+    country   String
+    phone     String
+    createdAt DateTime @default(now())
+
+    // Relations
+    user  User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    orders Order[]
+}
+
+model Coupon {
+    code        String   @id
+    description String
+    discount    Float
+    forNewUser  Boolean
+    forMember   Boolean  @default(false)
+    isPublic    Boolean
+    expiresAt   DateTime
+    createdAt   DateTime @default(now())
+}
+
+model Design {
+    id           String        @id @default(cuid())
+    userId       String
+    name         String?
+    previewImage String
+    tags         String[]      @default([])
+    createdAt    DateTime      @default(now())
+    updatedAt    DateTime      @updatedAt
+
+    // Relations
+    user    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    layers  DesignLayer[]  // all layers (images/text) of this design
+    products ProductDesign[]  // products that use this design
+}
+
+model DesignLayer {
+    id        String       @id @default(cuid())
+    designId  String
+    layerType LayerType
+    imageUrl  String?
+    text      String?
+    offsetX   Float        @default(0)
+    offsetY   Float        @default(0)
+    rotation  Float        @default(0)
+    scale     Float        @default(1)
+    part      PartPosition @default(FRONT)
+    order     Int          @default(0)
+    createdAt DateTime     @default(now())
+    updatedAt DateTime     @updatedAt
+
+    // Relations
+    design Design @relation(fields: [designId], references: [id], onDelete: Cascade)
+}
+
+model ProductDesign {
+    productId  String
+    designId   String
+    part       PartPosition @default(FRONT)
+    layerOrder Int?
+    
+    // Relations
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+    design  Design  @relation(fields: [designId], references: [id])
+    
+    @@id([productId, designId])
+}
+
+enum OrderStatus {
+    ORDER_PLACED
+    PROCESSING
+    SHIPPED
+    DELIVERED
+}
+
+enum PaymentMethod {
+    COD
+    STRIPE
+}
+
+enum LayerType {
+    IMAGE
+    TEXT
+}
+
+enum PartPosition {
+    FRONT
+    BACK
+    LEFT_SLEEVE
+    RIGHT_SLEEVE
+    HOOD
+}
