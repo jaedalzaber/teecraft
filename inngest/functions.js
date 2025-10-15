@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/PrismaClient";
+import { prisma } from "@/lib/prisma";
 import { inngest } from "./client";
 
 export const helloWorld = inngest.createFunction(
