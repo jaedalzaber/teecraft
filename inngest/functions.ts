@@ -15,13 +15,26 @@ export const syncUserCreation = inngest.createFunction(
   { id: "sync-user-create" },
   { event: "clerk/user.created" },
   async ({ event }) => {
-    const { data } = event.data;
+    const user = event.data; // Clerk's user object
+
+    // Extract basic info
+    const { id, first_name, last_name, primary_email_address_id } = user;
+
+    // Find the primary email address
+    const primaryEmailObj = user.email_addresses?.find(
+      (e: any) => e.id === primary_email_address_id
+    );
+
+    const email = primaryEmailObj?.email_address ?? null;
+
+    // Create the user record in your Prisma database
     await prisma.user.create({
       data: {
-        id: data.id,
-        email: data.email_addresses[0].email_address,
-        name: `${data.first_name} ${data.last_name}`,
-        image: data.image_url,
+        id,
+        email,
+        firstName: first_name,
+        lastName: last_name,
+        image: user.image_url ?? null,
       },
     });
   }
