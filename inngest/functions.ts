@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 import { inngest } from "./client";
 
 export const helloWorld = inngest.createFunction(
@@ -32,8 +32,7 @@ export const syncUserCreation = inngest.createFunction(
       data: {
         id,
         email,
-        firstName: first_name,
-        lastName: last_name,
+        name: first_name + " " + last_name,
         image: user.image_url ?? null,
       },
     });
