@@ -39,40 +39,39 @@ export const syncUserCreation = inngest.createFunction(
   }
 );
 
-// {
-//   "name": "clerk/user.created",
-//   "data": {
-//     "email":"alzaberjaed@gmail.com",
-//     "name":"älzaber",
-//     "image":""
-//   }
-// }
-
-// Inngest Function to update user data in database
 export const syncUserUpdation = inngest.createFunction(
   { id: "sync-user-update" },
   { event: "clerk/user.updated" },
   async ({ event }) => {
-    const { data } = event;
+    const user = event.data;
+    const { id, first_name, last_name, primary_email_address_id } = user;
+
+    const primaryEmailObj = user.email_addresses?.find(
+      (e: any) => e.id === primary_email_address_id
+    );
+
+    const email = primaryEmailObj?.email_address ?? null;
+
     await prisma.user.update({
-      where: { id: data.id },
+      where: { id },
       data: {
-        email: data.email_addresses[0].email_address,
-        name: `${data.first_name} ${data.last_name}`,
-        image: data.image_url,
+        email,
+        name: `${first_name ?? ""} ${last_name ?? ""}`.trim(),
+        image: user.image_url ?? null,
       },
     });
   }
 );
 
-// Inngest Function to delete user from database
 export const syncUserDeletion = inngest.createFunction(
   { id: "sync-user-delete" },
   { event: "clerk/user.deleted" },
   async ({ event }) => {
-    const { data } = event;
+    const { id } = event.data; // directly access id
+    if (!id) return;
+
     await prisma.user.delete({
-      where: { id: data.id },
+      where: { id },
     });
   }
 );
