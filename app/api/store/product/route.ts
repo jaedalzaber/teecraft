@@ -1,4 +1,4 @@
-import { getAuth } from "@clerk/nextjs/dist/types/server";
+import { getAuth } from "@clerk/nextjs/server";
 import { authSeller } from "@/middlewares/authSeller"
 import { NextResponse } from "next/server";
 import { handleUpload } from "@/configs/imageKit";
