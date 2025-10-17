@@ -1,0 +1,23 @@
+import authAdmin from "@/middlewares/authAdmin";
+import { getAuth } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+
+// Auth Admin
+export async function GET(request) {
+    try {
+        const { userId } = getAuth(request)
+        console.log(userId)
+        const isAdmin = await authAdmin(userId)
+
+        if (!isAdmin) {
+            return NextResponse.json({ error: 'not authorized' }, { status: 401 })
+        }
+
+        return NextResponse.json({ isAdmin })
+    } catch (error) {
+        // The image is cut off here, but a typical catch block in a Next.js 
+        // route handler would handle the error and return a response.
+        console.error(error)
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    }
+}
