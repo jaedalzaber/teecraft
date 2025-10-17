@@ -22,24 +22,25 @@ export async function POST(request) {
         const mrp = Number(formData.get("mrp"))
         const price = Number(formData.get("price"))
         const category = formData.get("category")
-        const images = formData.get("images")
+        const imageUrls = formData.getAll("images")
 
-        if (!name || !description || !mrp || !price || images.length < 1) {
+        if (!name || !description || !mrp || !price || imageUrls.length < 1 ||
+            imageUrls.some((url) => !url)) {
             return NextResponse.json({ error: 'missing product details' }, { status: 400 })
         }
 
-        const imagesUrl = await Promise.all(images.map(async (image) => {
-            const imageData = handleUpload(image)
-            return imageData
-        }))
+        // const imagesUrl = await Promise.all(images.map(async (image) => {
+        //     return image.url
+        // }))
 
         await prisma.product.create({
             data: {
-                name, description,
+                name,
+                description,
                 mrp,
                 price,
                 category,
-                images: imagesUrl,
+                images: imageUrls,
                 storeId
             }
         })
@@ -65,12 +66,13 @@ export async function GET(request) {
         }
 
         const products = await prisma.product.findMany({
-             where: { storeId }
+            where: { storeId }
         })
 
-        return NextResponse.json({products})
+        return NextResponse.json({ products })
 
     } catch (error) {
-
+        console.error(error)
+        return NextResponse.json({ error: error.code || error.message }, { status: 400 })
     }
 }

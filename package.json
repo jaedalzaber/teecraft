@@ -16,7 +16,7 @@
     "@neondatabase/serverless": "^1.0.2",
     "@prisma/adapter-neon": "^6.17.1",
     "@prisma/client": "^6.17.1",
-    "@reduxjs/toolkit": "^2.8.2",
+    "@reduxjs/toolkit": "^2.9.1",
     "@vercel/blob": "^2.0.0",
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",

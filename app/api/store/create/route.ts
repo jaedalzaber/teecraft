@@ -19,8 +19,6 @@ export async function POST(request) {
         const address = formData.get("address")
         const image = formData.get("image")
 
-        console.log("image")
-        console.log(image)
 
         if (!name || !username || !description || !email ||
             !contact || !address || !image) {
@@ -37,8 +35,6 @@ export async function POST(request) {
             LIMIT 1;
         `)[0];
 
-        console.log('store: ')
-        console.log(store)
 
         if (store) {
             console.log("store exits")

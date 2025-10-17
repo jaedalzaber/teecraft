@@ -8,7 +8,7 @@ export async function POST(request) {
     try {
         const { userId } = getAuth(request)
         const { productId } = await request.json()
-
+        
         if (!productId) {
             return NextResponse.json({ error: "missing details: productId" },
                 { status: 400 }

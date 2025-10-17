@@ -6,7 +6,6 @@ import { NextResponse } from "next/server";
 export async function GET(request) {
     try {
         const { userId } = getAuth(request)
-        console.log(userId)
         const isAdmin = await authAdmin(userId)
 
         if (!isAdmin) {

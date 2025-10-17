@@ -51,7 +51,8 @@ export default function CreateStore() {
             setMessage(
               "Your store has been approved, you can now add products to your store from dashboard"
             );
-            setTimeout(() => router.push("/"));
+            setTimeout(() => router.push("/store"));
+            break;
           case "rejected":
             setMessage(
               "Your store request has been rejected, contact the admin for more details"
@@ -96,8 +97,6 @@ export default function CreateStore() {
       let uploadResponse;
       try {
         uploadResponse = await handleUpload(storeInfo.image, `logo_${storeInfo.username}`);
-        console.log("Upload response:");
-        console.log(uploadResponse);
       } catch (error) {
         // Handle specific error types provided by the ImageKit SDK.
         if (error instanceof ImageKitAbortError) {

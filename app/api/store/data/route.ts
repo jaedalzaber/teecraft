@@ -1,6 +1,4 @@
 import prisma from "@/lib/prisma"
-import { authSeller } from "@/middlewares/authSeller"
-import { getAuth } from "@clerk/nextjs/dist/types/server"
 import { NextResponse } from "next/server"
 
 export async function GET(request) {
