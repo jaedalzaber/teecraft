@@ -7,12 +7,46 @@ import { useSelector } from "react-redux";
 import Image from "next/image";
 import { assets } from "@/assets/assets";
 import { useClerk, UserButton, useUser } from "@clerk/nextjs";
+import { authSeller } from "@/middlewares/authSeller";
+import { useEffect } from "react";
 
 const Navbar = () => {
   const router = useRouter();
 
   const { user } = useUser();
   const { openSignIn } = useClerk();
+
+  const [isSeller, setIsSeller] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkSellerStatus = async () => {
+      try {
+        const response = await fetch('/api/store/is-seller');
+        const data = await response.json();
+        setIsSeller(data.isSeller);
+      } catch (error) {
+        console.error('Error checking seller status:', error);
+        setIsSeller(false);
+      }
+    };
+
+    const checkAdminStatus = async () => {
+      try {
+        const response = await fetch('/api/admin/is-admin');
+        const data = await response.json();
+        setIsAdmin(data.isAdmin);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      }
+    };
+
+    if (user) {
+      checkSellerStatus();
+      checkAdminStatus()
+    }
+  }, [user, isSeller, isAdmin]);
 
   const [search, setSearch] = useState("");
   const cartCount = useSelector((state) => state.cart.total);
@@ -44,8 +78,7 @@ const Navbar = () => {
           <div className="hidden sm:flex items-center gap-4 lg:gap-8 text-slate-600">
             <Link href="/">Home</Link>
             <Link href="/shop">Shop</Link>
-            <Link href="/">About</Link>
-            <Link href="/">Contact</Link>
+            { isSeller ? <Link href="/store">Store</Link> : null}
 
             <form
               onSubmit={handleSearch}
@@ -88,6 +121,12 @@ const Navbar = () => {
                     onClick={() => router.push("/orders")}
                     labelIcon={<PackageIcon size={16} />}
                   />
+                  {isAdmin && (
+                     <UserButton.Action
+                    label="Dashboard"
+                    onClick={() => router.push("/admin")}
+                    labelIcon={<PackageIcon size={16} />}
+                  />)}
                 </UserButton.MenuItems>
               </UserButton>
             )}

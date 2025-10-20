@@ -13,7 +13,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Counter from "./Counter";
 import { useDispatch, useSelector } from "react-redux";
-
+import LoveButton from "./LoveButton";
+ 
 const ProductDetails = ({ product }) => {
   const productId = product.id;
   const currency = process.env.NEXT_PUBLIC_CURRENCY_SYMBOL || "$";
@@ -49,14 +50,14 @@ const ProductDetails = ({ product }) => {
                 src={image}
                 className="group-hover:scale-103 group-active:scale-95 transition"
                 alt=""
-                width={45}
-                height={45}
+                width={65}
+                height={65}
               />
             </div>
           ))}
         </div>
         <div className="flex justify-center items-center h-100 sm:size-113 bg-slate-100 rounded-lg ">
-          <Image src={mainImage} alt="" width={250} height={250} />
+          <Image src={mainImage} alt="" width={420} height={420} />
         </div>
       </div>
       <div className="flex-1">
@@ -64,7 +65,7 @@ const ProductDetails = ({ product }) => {
           {product.name}
         </h1>
         <div className="flex items-center mt-2">
-          {Array(5)
+          {/* {Array(5)
             .fill("")
             .map((_, index) => (
               <StarIcon
@@ -73,10 +74,8 @@ const ProductDetails = ({ product }) => {
                 className="text-transparent mt-0.5"
                 fill={averageRating >= index + 1 ? "#00C950" : "#D1D5DB"}
               />
-            ))}
-          <p className="text-sm ml-3 text-slate-500">
-            {product.ratings.length} Reviews
-          </p>
+            ))} */}
+          <LoveButton productId={productId} />
         </div>
         <div className="flex items-start my-6 gap-3 text-2xl font-semibold text-slate-800">
           <p>

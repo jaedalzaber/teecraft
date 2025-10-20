@@ -17,16 +17,7 @@ export default function StoreAddProduct() {
   const { getToken } = useAuth();
 
   const categories = [
-    "Electronics",
-    "Clothing",
-    "Home & Kitchen",
-    "Beauty & Health",
-    "Toys & Games",
-    "Sports & Outdoors",
-    "Books & Media",
-    "Food & Drink",
-    "Hobbies & Crafts",
-    "Others",
+    "T-Shirt", "Hoodie", "Pant", "V-Neck", "Mug", "Case"
   ];
 
   const [images, setImages] = useState({ 1: null, 2: null, 3: null, 4: null });
@@ -54,7 +45,7 @@ export default function StoreAddProduct() {
 
       const formData = new FormData();
       formData.append("name", productInfo.name);
-      formData.append("description", productInfo.description);
+      formData.append("description", ".");
       formData.append("mrp", productInfo.mrp);
       formData.append("price", productInfo.price);
       formData.append("category", productInfo.category);
@@ -151,7 +142,7 @@ export default function StoreAddProduct() {
           required
         />
       </label>
-
+{/* 
       <label htmlFor="" className="flex flex-col gap-2 my-6 ">
         Description
         <textarea
@@ -163,7 +154,7 @@ export default function StoreAddProduct() {
           className="w-full max-w-sm p-2 px-4 outline-none border border-slate-200 rounded resize-none"
           required
         />
-      </label>
+      </label> */}
 
       <div className="flex gap-5">
         <label htmlFor="" className="flex flex-col gap-2 ">
